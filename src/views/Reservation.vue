@@ -77,10 +77,15 @@
       </button>
     </form>
   </div>
+
+  <SuccessModal :visible="showSuccess" @close="showSuccess = false" />
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
+import { ref, reactive } from "vue";
+import SuccessModal from "../components/SuccessModal.vue";
+
+const showSuccess = ref(false);
 
 const form = reactive({
   name: "",
@@ -138,7 +143,8 @@ function submitForm() {
   if (!validate()) return;
 
   console.log("Reservation:", { ...form });
-  alert("訂位成功（示意）");
+
+  showSuccess.value = true;
 }
 
 function inputClass(error?: string) {
