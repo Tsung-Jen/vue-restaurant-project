@@ -2,7 +2,11 @@
   <div class="max-w-xl mx-auto px-6 py-16">
     <h1 class="text-3xl font-bold mb-8 text-center">線上訂位</h1>
 
-    <form @submit.prevent="submitForm" class="space-y-6">
+    <form
+      @submit.prevent="submitForm"
+      :class="{ 'pointer-events-none opacity-70': isSubmitting }"
+      class="space-y-6"
+    >
       <!-- Name -->
       <div>
         <label class="block mb-1 font-medium">姓名</label>
@@ -71,9 +75,33 @@
 
       <button
         type="submit"
-        class="w-full bg-red-600 text-white py-3 rounded font-semibold hover:bg-red-700 transition"
+        :disabled="isSubmitting"
+        class="w-full py-3 rounded font-semibold transition bg-red-600 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
-        送出訂位
+        <span v-if="!isSubmitting">送出訂位</span>
+
+        <span v-else class="flex items-center justify-center gap-2">
+          <svg
+            class="animate-spin h-5 w-5 text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            />
+          </svg>
+          送出中...
+        </span>
       </button>
     </form>
   </div>
@@ -86,6 +114,7 @@ import { ref, reactive } from "vue";
 import SuccessModal from "../components/SuccessModal.vue";
 
 const showSuccess = ref(false);
+const isSubmitting = ref(false);
 
 const form = reactive({
   name: "",
@@ -139,12 +168,25 @@ function validate() {
   return Object.keys(errors).length === 0;
 }
 
-function submitForm() {
+async function submitForm() {
+  if (isSubmitting.value) return;
   if (!validate()) return;
 
-  console.log("Reservation:", { ...form });
+  isSubmitting.value = true;
 
-  showSuccess.value = true;
+  try {
+    // 模擬 API 呼叫
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    console.log("Reservation:", { ...form });
+
+    showSuccess.value = true;
+  } catch (error) {
+    console.error(error);
+    alert("送出失敗，請稍後再試");
+  } finally {
+    isSubmitting.value = false;
+  }
 }
 
 function inputClass(error?: string) {
