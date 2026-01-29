@@ -106,7 +106,11 @@
     </form>
   </div>
 
-  <SuccessModal :visible="showSuccess" @close="showSuccess = false" />
+  <SuccessModal
+    :visible="showSuccess"
+    @close="showSuccess = false"
+    @reset="resetForm"
+  />
 </template>
 
 <script setup lang="ts">
@@ -196,5 +200,16 @@ function inputClass(error?: string) {
       ? "border-red-500 focus:ring-red-500"
       : "border-gray-300 focus:ring-red-400",
   ];
+}
+
+function resetForm() {
+  form.name = "";
+  form.phone = "";
+  form.date = "";
+  form.time = "";
+  form.guests = 1;
+  form.note = "";
+
+  Object.keys(errors).forEach((key) => delete errors[key]);
 }
 </script>

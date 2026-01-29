@@ -11,18 +11,19 @@
 
         <p class="mb-6 text-gray-700">我們已收到您的訂位資訊，期待您的光臨！</p>
 
-        <div class="flex gap-4">
-          <button
-            class="flex-1 border rounded py-2 hover:bg-gray-100"
-            @click="close"
-          >
-            關閉
+        <div class="flex flex-col gap-3">
+          <button class="border rounded py-2 hover:bg-gray-100" @click="close">
+            繼續修改
           </button>
 
           <button
-            class="flex-1 bg-red-600 text-white rounded py-2 hover:bg-red-700"
-            @click="goHome"
+            class="bg-red-600 text-white rounded py-2 hover:bg-red-700"
+            @click="resetAndClose"
           >
+            重新填寫
+          </button>
+
+          <button class="text-sm text-gray-500 underline" @click="goHome">
             返回首頁
           </button>
         </div>
@@ -38,7 +39,7 @@ defineProps<{
   visible: boolean;
 }>();
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "reset"]);
 const router = useRouter();
 
 function close() {
@@ -49,4 +50,10 @@ function goHome() {
   emit("close");
   router.push("/");
 }
+
+function resetAndClose() {
+  emit('reset')
+  emit('close')
+}
+
 </script>
