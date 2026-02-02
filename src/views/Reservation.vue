@@ -115,6 +115,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
+import { api } from '../services/api'
 import SuccessModal from "../components/SuccessModal.vue";
 
 const showSuccess = ref(false);
@@ -179,15 +180,15 @@ async function submitForm() {
   isSubmitting.value = true;
 
   try {
-    // 模擬 API 呼叫
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const res = await api.post("/reservations", form);
 
-    console.log("Reservation:", { ...form });
+    console.log("API response:", res.data);
 
     showSuccess.value = true;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    alert("送出失敗，請稍後再試");
+
+    alert(error.response?.data?.message || "系統錯誤，請稍後再試");
   } finally {
     isSubmitting.value = false;
   }
