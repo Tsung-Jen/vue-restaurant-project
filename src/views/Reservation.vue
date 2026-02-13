@@ -115,7 +115,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
-import { api } from '../services/api'
+import { api } from "../services/api";
 import SuccessModal from "../components/SuccessModal.vue";
 
 const showSuccess = ref(false);
@@ -173,11 +173,15 @@ function validate() {
   return Object.keys(errors).length === 0;
 }
 
+const RequestErrors = ref<Record<string, string[]>>({});
+
 async function submitForm() {
   if (isSubmitting.value) return;
   if (!validate()) return;
 
   isSubmitting.value = true;
+
+  RequestErrors.value = {}; // 每次送出先清空錯誤
 
   try {
     const res = await api.post("/reservations", form);
@@ -188,7 +192,26 @@ async function submitForm() {
   } catch (error: any) {
     console.error(error);
 
-    alert(error.response?.data?.message || "系統錯誤，請稍後再試");
+    const status = error.response?.status;
+
+    // Laravel validation error (422)
+    if (status === 422) {
+      errors.value = error.response.data.errors;
+      return;
+    }
+
+    // Business logic error (409 滿額)
+    if (status === 409) {
+      RequestErrors.value = {
+        time: [error.response.data.message],
+      };
+      return;
+    }
+
+    // 其他未知錯誤
+    RequestErrors.value = {
+      _global: ["系統錯誤，請稍後再試"],
+    };
   } finally {
     isSubmitting.value = false;
   }
